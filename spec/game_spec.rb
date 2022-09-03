@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 require_relative '../lib/game'
+require_relative '../lib/player'
 
 describe Game do
+  let(:player1) {Player.new('Youssef', '⚪')}
+  let(:player2) {Player.new('Nour', '⚫')}
+
   describe '#create_board' do
     context 'create an X-Y sized grid' do
-      subject(:board_test) { described_class.new }
+      subject(:board_test) { described_class.new(player1, player2) }
 
       xit 'creates a 7x6 grid' do
         # assign
@@ -21,7 +25,7 @@ describe Game do
 
   describe '#position_empty?' do
     context 'check if the position is empty' do
-      subject(:position_test) { described_class.new }
+      subject(:position_test) { described_class.new(player1, player2) }
       it 'position is empty' do
         # Assign
         x_axis = 0
@@ -46,7 +50,7 @@ describe Game do
 
   describe '#vertical_sequence?' do
     context 'check if a player has formed a 4 in a row pieces vertically' do
-      subject(:vertical_test) { described_class.new }
+      subject(:vertical_test) { described_class.new(player1, player2) }
 
       it '4 in a row - Vertically' do
         # Assign
@@ -89,7 +93,7 @@ describe Game do
 
   describe '#horizontal_sequence?' do
     context 'check if a player has formed a 4 in a row pieces horizontally' do
-      subject(:horizontal_test) { described_class.new }
+      subject(:horizontal_test) { described_class.new(player1, player2) }
 
       it '4 in a row - Horizontally' do
         # Assign
@@ -131,7 +135,7 @@ describe Game do
 
   describe '#diagonal_sequence?' do
     context 'check if a player has formed a 4 in a row pieces diagonally' do
-      subject(:diagonal_test) { described_class.new }
+      subject(:diagonal_test) { described_class.new(player1, player2) }
 
       it 'no 4 in a row' do
         # Assign
@@ -168,7 +172,7 @@ describe Game do
   end
 
   describe '#verify_input' do
-    subject(:input_check) { described_class.new }
+    subject(:input_check) { described_class.new(player1, player2) }
 
     context 'Valid input as an argument' do
       it 'returns the valid input' do
@@ -187,7 +191,7 @@ describe Game do
   end
 
   describe '#selection' do
-    subject(:selection_test) { described_class.new }
+    subject(:selection_test) { described_class.new(player1, player2) }
     context 'when the user input is valid' do
       it 'stops loop and stores selection' do
         valid_input = 3
@@ -212,7 +216,7 @@ describe Game do
   end
 
   describe '#set_piece' do
-    subject(:set_check) { described_class.new }
+    subject(:set_check) { described_class.new(player1, player2) }
     context 'when the user selects a column to play in, place it accordingly' do
 
       it 'places at the start of the 3rd column because there is no other pieces at the first row' do
@@ -222,6 +226,59 @@ describe Game do
         set_check.set_piece
         position = set_check.instance_variable_get(:@board)[0][user_column - 1]
         expect(position).to eq(user_symbol)
+      end
+    end
+  end
+
+  describe '#board_complete?' do
+    subject(:board_check) { described_class.new(player1, player2) }
+    context 'Check if the board status' do
+      let(:full_board) {Array.new(6) { Array.new(7) { 'ph' } }}
+      it 'Board is complete' do
+        board_check.instance_variable_set(:@board, full_board)
+        expect(board_check.board_complete?).to be true
+      end
+      it 'Board is not complete' do
+        expect(board_check.board_complete?).to be false
+      end
+    end
+  end
+
+  describe '#draw?' do
+    subject(:draw_check) { described_class.new(player1, player2) }
+    context 'Check if there is a draw' do
+      it 'Board is complete and there is no winner' do
+        allow(draw_check).to receive(:board_complete?).and_return(true)
+        allow(draw_check).to receive(:winner?).and_return(false)
+        expect(draw_check.draw?).to be true
+      end
+      it 'Board is complete but there is a winner' do
+        allow(draw_check).to receive(:board_complete?).and_return(true)
+        allow(draw_check).to receive(:winner?).and_return(true)
+        expect(draw_check.draw?).to be false
+      end
+    end
+  end
+  describe '#winner?' do
+    subject(:winner_check) { described_class.new(player1, player2) }
+    context 'Check if a player has won' do
+      it 'A player has 4 pieces in a row vertically' do
+        allow(winner_check).to receive(:vertical_sequence?).and_return(true)
+        expect(winner_check.winner?).to be true
+      end
+      it 'A player has 4 pieces in a row horizontally' do
+        allow(winner_check).to receive(:horizontal_sequence?).and_return(true)
+        expect(winner_check.winner?).to be true
+      end
+      it 'A player has 4 pieces in a row diagonally' do
+        allow(winner_check).to receive(:diagonal_sequence?).and_return(true)
+        expect(winner_check.winner?).to be true
+      end
+      it 'No player has 4 pieces in a row either vertically,horizontally or diagonally' do
+        allow(winner_check).to receive(:vertical_sequence?).and_return(false)
+        allow(winner_check).to receive(:horizontal_sequence?).and_return(false)
+        allow(winner_check).to receive(:diagonal_sequence?).and_return(false)
+        expect(winner_check.winner?).to be false
       end
     end
   end

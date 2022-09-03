@@ -3,8 +3,11 @@ require 'pry-byebug'
 class Game
   attr_reader :board
 
-  def initialize
-    @board = Array.new(6) { Array.new(7) { |index| index + rand(1..30)} }
+  def initialize(player1, player2)
+    @p1 = player1
+    @p2 = player2
+    @players = [@p1, @p2]
+    @board = Array.new(6) { Array.new(7) { |index| index + rand(30)} }
     # @board = create_board(7, 6)
   end
 
@@ -21,51 +24,18 @@ class Game
 
   def position_empty?(x_axis, y_axis)
     # @board[x_axis][y_axis].nil?
-    return false if @board[x_axis][y_axis] == 'x' || @board[x_axis][y_axis] == 'y'
+    return false if @board[x_axis][y_axis] == @p1.piece || @board[x_axis][y_axis] == @p2.piece
 
     true
   end
 
-  # def vertical_sequence?
-  #   sequence = 0
-  #   @board.each do |row|
-  #     break if sequence == 3
+  def board_complete?
+    # return true if @board.each { |row| row.none?(Integer)}
+    check = @board.select { |row| row.none?(Integer) }
+    return true if check.length == 6
 
-  #     row.each_index do |i|
-  #       break if sequence == 3
-  #       break if row[i + 1].nil?
-
-  #       if row[i] == row[i + 1]
-  #         sequence += 1
-  #       else
-  #         sequence = 0
-  #       end
-  #     end
-  #   end
-  #   sequence == 3
-  # end
-
-  # def horizontal_sequence?
-  #   sequence = 0
-  #   column_index = 0
-  #   until column_index == @board.length
-  #     break if sequence == 3
-
-  #     sequence = 0
-  #     @board.each_index do |row_index|
-  #       break if sequence == 3
-  #       break if @board[row_index + 1].nil?
-
-  #       if @board[row_index][column_index] == @board[row_index + 1][column_index]
-  #         sequence += 1
-  #       else
-  #         sequence = 0
-  #       end
-  #     end
-  #     column_index += 1
-  #   end
-  #   sequence == 3
-  # end
+    false
+  end
 
   def vertical_sequence?
     column_index = 0
@@ -121,6 +91,12 @@ class Game
     false
   end
 
+  def draw?
+    return true if board_complete? && !winner?
+
+    false
+  end
+
   def player_selection
     puts 'Pick where you want to play (between 1 and 7)'
     gets.chomp
@@ -139,16 +115,57 @@ class Game
     user_selection
   end
 
-  def set_piece
+  # Edge case it still accepts values in columns even after they are full
+
+  def set_piece(piece)
     user_column_to_play_in = selection - 1
     @board.each_index do |row|
-      next if @board[row][user_column_to_play_in] == 'p1'
+      next if @board[row][user_column_to_play_in] == piece
 
-      @board[row][user_column_to_play_in] = 'p1' if @board[row][user_column_to_play_in].instance_of?(Integer)
+      @board[row][user_column_to_play_in] = piece if @board[row][user_column_to_play_in].instance_of?(Integer)
 
-      break if @board[row][user_column_to_play_in] == 'p1'
+      break if @board[row][user_column_to_play_in] == piece
     end
   end
-
 end
 
+  # def vertical_sequence?
+  #   sequence = 0
+  #   @board.each do |row|
+  #     break if sequence == 3
+
+  #     row.each_index do |i|
+  #       break if sequence == 3
+  #       break if row[i + 1].nil?
+
+  #       if row[i] == row[i + 1]
+  #         sequence += 1
+  #       else
+  #         sequence = 0
+  #       end
+  #     end
+  #   end
+  #   sequence == 3
+  # end
+
+  # def horizontal_sequence?
+  #   sequence = 0
+  #   column_index = 0
+  #   until column_index == @board.length
+  #     break if sequence == 3
+
+  #     sequence = 0
+  #     @board.each_index do |row_index|
+  #       break if sequence == 3
+  #       break if @board[row_index + 1].nil?
+
+  #       if @board[row_index][column_index] == @board[row_index + 1][column_index]
+  #         sequence += 1
+  #       else
+  #         sequence = 0
+  #       end
+  #     end
+  #     column_index += 1
+  #   end
+  #   sequence == 3
+  # end
