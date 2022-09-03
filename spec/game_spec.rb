@@ -39,7 +39,8 @@ describe Game do
         # Assign
         x_axis = 0
         y_axis = 0
-        position_test.instance_variable_get(:@board)[x_axis][y_axis] = 'x'
+        player_piece = position_test.instance_variable_get(:@p1).piece
+        position_test.instance_variable_get(:@board)[x_axis][y_axis] = player_piece
         # Act
         status = position_test.position_empty?(x_axis, y_axis)
         # Assert

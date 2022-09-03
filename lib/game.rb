@@ -128,28 +128,6 @@ class Game
     end
   end
 
-  def turn
-    @players.each do |player|
-      turn_over = false
-      until turn_over || winner?
-        set_piece(player.piece)
-        @board.each { |row| p row }
-        turn_over = true
-      end
-    end
-  end
-
-  def play
-    until winner? || draw?
-      turn
-    end
-
-    puts 'someone won' if winner?
-    puts 'someone drew' if draw?
-  end
-
-  def display_board
-  end
 end
 
   # def vertical_sequence?
