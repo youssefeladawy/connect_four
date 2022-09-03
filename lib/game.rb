@@ -120,12 +120,35 @@ class Game
   def set_piece(piece)
     user_column_to_play_in = selection - 1
     @board.each_index do |row|
-      next if @board[row][user_column_to_play_in] == piece
+      next unless position_empty?(row, user_column_to_play_in)
 
-      @board[row][user_column_to_play_in] = piece if @board[row][user_column_to_play_in].instance_of?(Integer)
+      @board[row][user_column_to_play_in] = piece if position_empty?(row, user_column_to_play_in)
 
-      break if @board[row][user_column_to_play_in] == piece
+      break unless position_empty?(row, user_column_to_play_in)
     end
+  end
+
+  def turn
+    @players.each do |player|
+      turn_over = false
+      until turn_over || winner?
+        set_piece(player.piece)
+        @board.each { |row| p row }
+        turn_over = true
+      end
+    end
+  end
+
+  def play
+    until winner? || draw?
+      turn
+    end
+
+    puts 'someone won' if winner?
+    puts 'someone drew' if draw?
+  end
+
+  def display_board
   end
 end
 
