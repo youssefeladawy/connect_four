@@ -4,8 +4,8 @@ require_relative 'lib/game'
 require_relative 'lib/manual'
 include Manual
 
-puts "#{manual}\n" 
-game_pieces = ['⚪', '⚫']
+puts "#{manual}\n"
+game_pieces = ['⚉', '⚇']
 
 puts 'Player 1 please enter your name'
 p1_name = gets.chomp

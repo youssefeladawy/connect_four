@@ -248,9 +248,31 @@ describe Game do
   describe '#column_full?' do
     subject(:column_check) { described_class.new(player1, player2) }
     context 'Check if the column the user picked is full or not' do
-      xit 'Column is full' do
+      it 'Column is full' do
+        column = 0
+        column_check.instance_variable_get(:@board)[0][column] = 'y'
+        column_check.instance_variable_get(:@board)[1][column] = 'y'
+        column_check.instance_variable_get(:@board)[2][column] = 'y'
+        column_check.instance_variable_get(:@board)[3][column] = 'y'
+        column_check.instance_variable_get(:@board)[4][column] = 'y'
+        column_check.instance_variable_get(:@board)[5][column] = 'y'
+
+        status = column_check.column_full?(column)
+
+        expect(status).to be true
       end
-      xit 'Column is not full' do
+      it 'Column is not full' do
+        column = 0
+        column_check.instance_variable_get(:@board)[0][column] = 'y'
+        column_check.instance_variable_get(:@board)[1][column] = 'y'
+        column_check.instance_variable_get(:@board)[2][column] = 3
+        column_check.instance_variable_get(:@board)[3][column] = 'y'
+        column_check.instance_variable_get(:@board)[4][column] = 'y'
+        column_check.instance_variable_get(:@board)[5][column] = 'y'
+
+        status = column_check.column_full?(column)
+
+        expect(status).to be false
       end
     end
   end
