@@ -10,6 +10,7 @@ class Game
     @p1 = player1
     @p2 = player2
     @players = [@p1, @p2]
+    @game_winner = nil
     @board = Array.new(6) { Array.new(7) { |index| index + rand(30)} }
     # @board = create_board(7, 6)
   end
@@ -32,6 +33,18 @@ class Game
     true
   end
 
+  # Fixes Edge case that makes the #set_piece method
+  # accepts values in columns even after they are full
+  def column_full?(column)
+    full = true
+    @board.each_index do |row_index|
+      break if full == false
+
+      full = false if @board[row_index][column].is_a?(Integer)
+    end
+    full
+  end
+
   def board_complete?
     # return true if @board.each { |row| row.none?(Integer)}
     check = @board.select { |row| row.none?(Integer) }
@@ -47,6 +60,7 @@ class Game
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
+
         return true if @board[row_index][column_index] == @board[row_index][column_index + 1] && @board[row_index][column_index] == @board[row_index][column_index + 2] && @board[row_index][column_index] == @board[row_index][column_index + 3]
       end
 
@@ -62,6 +76,7 @@ class Game
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
+
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index] && @board[row_index][column_index] == @board[row_index + 2][column_index] && @board[row_index][column_index] == @board[row_index + 3][column_index] 
       end
 
@@ -77,6 +92,7 @@ class Game
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
+
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index + 1] && @board[row_index][column_index] == @board[row_index + 2][column_index + 2] && @board[row_index][column_index] == @board[row_index + 3][column_index + 3] 
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index - 1] && @board[row_index][column_index] == @board[row_index + 2][column_index - 2] && @board[row_index][column_index] == @board[row_index + 3][column_index - 3]
       end
@@ -86,16 +102,16 @@ class Game
     false
   end
 
-  def winner?
-    return true if vertical_sequence?
-    return true if horizontal_sequence?
-    return true if diagonal_sequence?
+  def draw?
+    return true if board_complete? && !winner?
 
     false
   end
 
-  def draw?
-    return true if board_complete? && !winner?
+  def winner?
+    return true if vertical_sequence?
+    return true if horizontal_sequence?
+    return true if diagonal_sequence?
 
     false
   end
@@ -116,18 +132,6 @@ class Game
       puts 'You can only choose a number between 1 and 7' unless user_selection
     end
     user_selection
-  end
-
-  # Fixes Edge case that makes the #set_piece method
-  # accepts values in columns even after they are full
-  def column_full?(column)
-    full = true
-    @board.each_index do |row_index|
-      break if full == false
-
-      full = false if @board[row_index][column].is_a?(Integer)
-    end
-    full
   end
 
   def set_piece(piece)
@@ -155,8 +159,26 @@ class Game
         set_piece(player.piece)
         puts "\n"
         display_board(@board)
+        @game_winner = player.name if winner?
         turn_over = true
       end
+    end
+  end
+
+  def play
+    puts display_board(@board)
+    turn until winner? || draw?
+
+    puts "#{@game_winner} wins" if winner?
+    puts 'You guys drew' if draw?
+    play_again
+  end
+
+  def play_again
+    if winner? || draw?
+      puts 'Enter Y if you want to play again?'
+      answer = gets.chomp.downcase
+      Game.new(@p1, @p2).play if answer == 'y'
     end
   end
 end
