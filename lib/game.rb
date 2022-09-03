@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 require 'pry-byebug'
-
-
 class Game
   attr_reader :board
 
   def initialize
-    @board = Array.new(6) { Array.new(7) { |index| "#{index + rand(10)}" } }
+    @board = Array.new(6) { Array.new(7) { |index| index + rand(1..30)} }
     # @board = create_board(7, 6)
   end
 
@@ -72,11 +70,13 @@ class Game
   def vertical_sequence?
     column_index = 0
     until column_index == @board.length
+
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
         return true if @board[row_index][column_index] == @board[row_index][column_index + 1] && @board[row_index][column_index] == @board[row_index][column_index + 2] && @board[row_index][column_index] == @board[row_index][column_index + 3]
       end
+
       column_index += 1
     end
     false
@@ -85,13 +85,13 @@ class Game
   def horizontal_sequence?
     column_index = 0
     until column_index == @board.length
+
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index] && @board[row_index][column_index] == @board[row_index + 2][column_index] && @board[row_index][column_index] == @board[row_index + 3][column_index] 
-
-        false
       end
+
       column_index += 1
     end
     false
@@ -100,14 +100,14 @@ class Game
   def diagonal_sequence?
     column_index = 0
     until column_index == @board.length
+
       @board.each_index do |row_index|
         next if @board[row_index + 1].nil? || @board[row_index + 2].nil? || @board[row_index + 3].nil?
         next if @board[row_index + 1][column_index + 1].nil? || @board[row_index + 2][column_index + 2].nil? || @board[row_index + 3][column_index + 3].nil?
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index + 1] && @board[row_index][column_index] == @board[row_index + 2][column_index + 2] && @board[row_index][column_index] == @board[row_index + 3][column_index + 3] 
         return true if @board[row_index][column_index] == @board[row_index + 1][column_index - 1] && @board[row_index][column_index] == @board[row_index + 2][column_index - 2] && @board[row_index][column_index] == @board[row_index + 3][column_index - 3]
-
-        false
       end
+
       column_index += 1
     end
     false
@@ -121,53 +121,34 @@ class Game
     false
   end
 
-  # def horizontal_sequence?
-  #   sequence = 0
+  def player_selection
+    puts 'Pick where you want to play (between 1 and 7)'
+    gets.chomp
+  end
 
-  #   @board.each_index do |index|
+  def verify_input(input)
+    return input if input.between?(1, 7)
+  end
 
-  #     break if sequence == 3
-  #     break if @board[index + 1].nil?
+  def selection
+    user_selection = nil
+    until user_selection
+      user_selection = verify_input(player_selection.to_i)
+      puts 'You can only choose a number between 1 and 7' unless user_selection
+    end
+    user_selection
+  end
 
-  #     if @board[index][0] == @board[index + 1][0]
-  #       sequence += 1
-  #     else
-  #       sequence = 0
-  #     end
-  #   end
-  #   sequence == 3
-  # end
+  def set_piece
+    user_column_to_play_in = selection - 1
+    @board.each_index do |row|
+      next if @board[row][user_column_to_play_in] == 'p1'
 
-  # def winner?
-  #   @board.each do |row|
-  #     not_equal = false
-  #     until not_equal
-  #       sequence = 0
-  #       row.each_index do |i|
-  #         not_equal = true if sequence == 4
-  #         break if sequence == 4
+      @board[row][user_column_to_play_in] = 'p1' if @board[row][user_column_to_play_in].instance_of?(Integer)
 
-  #         if row [i] == row[i + 1]
-  #           sequence += 1
-  #         else
-  #           sequence = 0
-  #         end
-  #       end
-  #       # row.select { |element| element == 'x'}
-  #     end
-  #   end
-  # end
-
-  # Player 1 Plays
-  # Player 1 can play in only empty positions
-  # Player 1 cant skip a row unless there is a piece in one of its columns
-  # After playing check if player wins? if not > next player plays
-
-  # how to tackle player playing in a position that shouldnt be available yet?
-  # Well we can set an array of 7 elements which are 7 options for the user to select from
-  # and once the user lets say picks 1 in the first turn
-  # then the 1 in the next row will be available while the other 6 remains pointing to the first row
+      break if @board[row][user_column_to_play_in] == 'p1'
+    end
+  end
 
 end
 
-# Game.new.winner?

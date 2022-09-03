@@ -166,4 +166,63 @@ describe Game do
       end
     end
   end
+
+  describe '#verify_input' do
+    subject(:input_check) { described_class.new }
+
+    context 'Valid input as an argument' do
+      it 'returns the valid input' do
+        user_selection = '5'
+        verify = input_check.verify_input(user_selection.to_i)
+        expect(verify).to eq(5)
+      end
+    end
+    context 'Invalid input as an argument' do
+      it 'returns nil' do
+        user_selection = '8'
+        verify = input_check.verify_input(user_selection.to_i)
+        expect(verify).to be nil 
+      end
+    end
+  end
+
+  describe '#selection' do
+    subject(:selection_test) { described_class.new }
+    context 'when the user input is valid' do
+      it 'stops loop and stores selection' do
+        valid_input = 3
+        allow(selection_test).to receive(:player_selection).and_return(valid_input)
+        expect(selection_test).not_to receive(:puts).with('You can only choose a number between 1 and 7')
+        selection_test.selection
+
+      end
+    end
+
+    context 'when the user input is invalid once, then it is valid in the second try' do
+      before do
+        invalid_input = 'xd'
+        valid_input = 3
+        allow(selection_test).to receive(:player_selection).and_return(invalid_input, valid_input)
+      end
+      it 'completes loop and stores user selection' do
+        expect(selection_test).to receive(:puts).with('You can only choose a number between 1 and 7').once
+        selection_test.selection
+      end
+    end
+  end
+
+  describe '#set_piece' do
+    subject(:set_check) { described_class.new }
+    context 'when the user selects a column to play in, place it accordingly' do
+
+      it 'places at the start of the 3rd column because there is no other pieces at the first row' do
+        user_symbol = 'p1'
+        user_column = 2
+        allow(set_check).to receive(:selection).and_return(user_column)
+        set_check.set_piece
+        position = set_check.instance_variable_get(:@board)[0][user_column - 1]
+        expect(position).to eq(user_symbol)
+      end
+    end
+  end
 end
