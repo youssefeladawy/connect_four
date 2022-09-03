@@ -127,7 +127,6 @@ class Game
       break unless position_empty?(row, user_column_to_play_in)
     end
   end
-
 end
 
   # def vertical_sequence?

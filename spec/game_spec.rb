@@ -221,12 +221,12 @@ describe Game do
     context 'when the user selects a column to play in, place it accordingly' do
 
       it 'places at the start of the 3rd column because there is no other pieces at the first row' do
-        user_symbol = 'p1'
+        player_piece = set_check.instance_variable_get(:@p1).piece
         user_column = 2
         allow(set_check).to receive(:selection).and_return(user_column)
-        set_check.set_piece
+        set_check.set_piece(player_piece)
         position = set_check.instance_variable_get(:@board)[0][user_column - 1]
-        expect(position).to eq(user_symbol)
+        expect(position).to eq(player_piece)
       end
     end
   end
