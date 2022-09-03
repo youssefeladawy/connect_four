@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 require 'pry-byebug'
+require_relative 'display'
 
 class Game
+  include Display
   attr_reader :board
 
   def initialize(player1, player2)
@@ -142,6 +144,19 @@ class Game
       @board[row][user_column_to_play_in] = piece if position_empty?(row, user_column_to_play_in)
 
       break unless position_empty?(row, user_column_to_play_in)
+    end
+  end
+
+  def turn
+    @players.each do |player|
+      turn_over = false
+      until turn_over || winner?
+        puts "#{player.name}"
+        set_piece(player.piece)
+        puts "\n"
+        display_board(@board)
+        turn_over = true
+      end
     end
   end
 end
