@@ -1,7 +1,10 @@
 require_relative 'lib/player'
 require_relative 'lib/game'
 
-puts 'Connect 4 is ..'
+require_relative 'lib/manual'
+include Manual
+
+puts "#{manual}\n" 
 game_pieces = ['⚪', '⚫']
 
 puts 'Player 1 please enter your name'

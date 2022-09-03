@@ -245,6 +245,16 @@ describe Game do
     end
   end
 
+  describe '#column_full?' do
+    subject(:column_check) { described_class.new(player1, player2) }
+    context 'Check if the column the user picked is full or not' do
+      xit 'Column is full' do
+      end
+      xit 'Column is not full' do
+      end
+    end
+  end
+
   describe '#draw?' do
     subject(:draw_check) { described_class.new(player1, player2) }
     context 'Check if there is a draw' do

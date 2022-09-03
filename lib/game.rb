@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'pry-byebug'
+
 class Game
   attr_reader :board
 
@@ -115,10 +116,26 @@ class Game
     user_selection
   end
 
-  # Edge case it still accepts values in columns even after they are full
+  # Fixes Edge case that makes the #set_piece method
+  # accepts values in columns even after they are full
+  def column_full?(column)
+    full = true
+    @board.each_index do |row_index|
+      break if full == false
+
+      full = false if @board[row_index][column].is_a?(Integer)
+    end
+    full
+  end
 
   def set_piece(piece)
     user_column_to_play_in = selection - 1
+
+    while column_full?(user_column_to_play_in)
+      puts 'column is full'
+      user_column_to_play_in = selection - 1
+    end
+
     @board.each_index do |row|
       next unless position_empty?(row, user_column_to_play_in)
 
